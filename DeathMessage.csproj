@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>DeathMessage</AssemblyName>
+    <RootNamespace>DeathMessage</RootNamespace>
+    <Version>0.1.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <Deterministic>true</Deterministic>
+    <!-- Symbols inside the DLL, so it also loads through ScriptEngine (hot reload), which reads them. -->
+    <DebugType>embedded</DebugType>
+    <!-- The symbols record source file paths; keep the build machine's folders out of them. -->
+    <PathMap>$(MSBuildProjectDirectory)=/_/,$(NuGetPackageRoot)=/_nuget/,$(UserProfile)=/_home/</PathMap>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!-- Points VALHEIM_DEDI_INSTALL at a dedicated-server layout (valheim_server_Data\Managed + BepInEx\core). Not committed. -->
+  <Import Project="Environment.props" Condition="Exists('Environment.props')" />
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.1" PrivateAssets="all" />
+    <Reference Include="assembly_valheim" Publicize="true">
+      <HintPath>$(VALHEIM_DEDI_INSTALL)\valheim_server_Data\Managed\assembly_valheim.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="assembly_utils">
+      <HintPath>$(VALHEIM_DEDI_INSTALL)\valheim_server_Data\Managed\assembly_utils.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="assembly_guiutils">
+      <HintPath>$(VALHEIM_DEDI_INSTALL)\valheim_server_Data\Managed\assembly_guiutils.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(VALHEIM_DEDI_INSTALL)\valheim_server_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(VALHEIM_DEDI_INSTALL)\valheim_server_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(VALHEIM_DEDI_INSTALL)\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(VALHEIM_DEDI_INSTALL)\BepInEx\core\BepInEx.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

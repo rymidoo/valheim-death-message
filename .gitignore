@@ -1,0 +1,9 @@
+bin/
+obj/
+pkg/
+*.zip
+*.user
+.vs/
+refs/
+.claude/
+HANDOVER.md
