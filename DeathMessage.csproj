@@ -4,7 +4,7 @@
     <TargetFramework>net472</TargetFramework>
     <AssemblyName>DeathMessage</AssemblyName>
     <RootNamespace>DeathMessage</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.1.3</Version>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <Deterministic>true</Deterministic>
@@ -51,5 +51,15 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
+
+  <!-- Thunderstore package: pkg\ holds manifest, icon, README, CHANGELOG and plugins\DeathMessage.dll,
+       zipped to DeathMessage-<version>.zip for upload. -->
+  <Target Name="Package" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <MakeDir Directories="$(MSBuildProjectDirectory)\pkg\plugins" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)\pkg\plugins" />
+    <Copy SourceFiles="manifest.json;README.md;CHANGELOG.md" DestinationFolder="$(MSBuildProjectDirectory)\pkg" />
+    <Copy SourceFiles="icon.png" DestinationFolder="$(MSBuildProjectDirectory)\pkg" Condition="Exists('icon.png')" />
+    <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)\pkg" DestinationFile="$(MSBuildProjectDirectory)\DeathMessage-$(Version).zip" Overwrite="true" />
+  </Target>
 
 </Project>

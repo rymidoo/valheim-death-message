@@ -12,7 +12,7 @@ namespace DeathMessage
 {
 	// Client half: what killed you. The last hits your character takes are remembered (source,
 	// damage by type after armor / block / resistances, health left); when you die the killing hit
-	// is turned into a cause, shown, added to a history file and reported to the server.
+	// is turned into a cause, shown on screen and in the chat box, added to a history file and reported to the server.
 	// The method is the death log of Valheim Vanilla Plus; here every cause also has a wording
 	// about somebody else ("was killed by Troll"), which is the one that leaves this game.
 	internal static class DeathTracker
@@ -56,8 +56,6 @@ namespace DeathMessage
 		private static readonly List<Death> Deaths = new List<Death>(); // newest first
 		// Who last put fire / poison / ... on you directly, for the ticks that follow without an attacker.
 		private static readonly Dictionary<string, KeyValuePair<string, float>> ElementFrom = new Dictionary<string, KeyValuePair<string, float>>();
-		private static string announce;
-		private static float announceAt;
 
 		// ----- recording -----
 
@@ -70,7 +68,7 @@ namespace DeathMessage
 		private static void EnterEffect(StatusEffect se) { effectDepth++; effect = se; }
 		private static void LeaveEffect() { if (--effectDepth <= 0) { effectDepth = 0; effect = null; } }
 
-		private static bool On => DeathMessagePlugin.LocalLog.Value || DeathMessagePlugin.SendToServer.Value;
+		private static bool On => DeathMessagePlugin.LocalLog.Value || DeathMessagePlugin.SendToServer.Value || DeathMessagePlugin.ShoutDeath.Value;
 
 		private static string EffectName(StatusEffect se)
 		{
@@ -208,7 +206,9 @@ namespace DeathMessage
 			Wording cause = seen ? Cause(last) : new Wording("Died with no damage seen just before (a command, or a hit this game did not process)", "died of unknown causes");
 			string biome = p.GetCurrentBiome().ToString();
 
-			if (DeathMessagePlugin.SendToServer.Value) Relay.Report(cause.They, biome);
+			// The report first: the server then knows the shout that follows is this death, not chatter.
+			if (DeathMessagePlugin.SendToServer.Value) Relay.Report(cause.They, biome, p.transform.position);
+			if (DeathMessagePlugin.ShoutDeath.Value) Relay.Shout(cause.They, biome, p.transform.position);
 
 			var death = new Death
 			{
@@ -231,14 +231,16 @@ namespace DeathMessage
 			Save();
 			DeathMessagePlugin.Log.LogInfo($"{death.Cause} in {death.World} ({death.Biome}) at {death.Pos}" + (death.Hits.Count > 0 ? "\n  " + string.Join("\n  ", death.Hits) : ""));
 
-			if (ShownByAnotherMod()) return;
-			p.Message(MessageHud.MessageType.Center, $"<color=#ff6060>{death.Cause}</color>");
-			announce = death.Cause; announceAt = Time.unscaledTime + 6f; // said again once you are back on your feet
+			// In the chat box, where it stays readable in the history after the respawn - the shout
+			// is already there when it was made - and in the middle of the screen, unless another
+			// mod is already putting it there.
+			if (!DeathMessagePlugin.ShoutDeath.Value) Relay.ChatLine(death.Cause);
+			if (!CentreShownByAnotherMod()) p.Message(MessageHud.MessageType.Center, $"<color=#ff6060>{death.Cause}</color>");
 		}
 
 		// Valheim Vanilla Plus and Valheim God Mode carry the same death log and already put the
-		// cause on screen. God Mode takes it over from Vanilla Plus when both are installed.
-		private static bool ShownByAnotherMod()
+		// cause in the middle of the screen. God Mode takes it over from Vanilla Plus when both are installed.
+		private static bool CentreShownByAnotherMod()
 		{
 			bool Shows(string guid) =>
 				Chainloader.PluginInfos.TryGetValue(guid, out PluginInfo info) && info.Instance != null
@@ -266,15 +268,7 @@ namespace DeathMessage
 			}
 		}
 
-		// Every frame: repeats the cause top-left once you have respawned.
-		internal static void Update()
-		{
-			Relay.Hello();
-			Player p = Player.m_localPlayer;
-			if (announce == null || p == null || p.IsDead() || Time.unscaledTime < announceAt) return;
-			p.Message(MessageHud.MessageType.TopLeft, "Last death: " + announce);
-			announce = null;
-		}
+		internal static void Update() => Relay.Hello();
 
 		// ----- file -----
 

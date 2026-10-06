@@ -1,0 +1,9 @@
+{
+  "name": "DeathMessage",
+  "version_number": "0.1.3",
+  "website_url": "https://github.com/liekos47/valheim-death-message",
+  "description": "Says what killed a player and where: in everyone's chat, on screen and in Discord (via DiscordConnector). Install in the players' games and on the server.",
+  "dependencies": [
+    "denikson-BepInExPack_Valheim-5.4.2333"
+  ]
+}
