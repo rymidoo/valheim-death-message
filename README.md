@@ -10,6 +10,8 @@ burned, poisoned by a Blob, crushed by a tree, hit by another player - whatever 
 
 One DLL, for the players' games and the server.
 
+**Download:** [DeathMessage on Thunderstore](https://thunderstore.io/c/valheim/p/liekos47/DeathMessage/).
+
 ## Screenshots
 
 In the chat box of every player, with the mod or without:
@@ -55,7 +57,8 @@ Their own deaths are announced by nobody and go to Discord as DiscordConnector's
 
 ## Install
 
-Needs [BepInExPack Valheim](https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/).
+Get it from [Thunderstore](https://thunderstore.io/c/valheim/p/liekos47/DeathMessage/). Needs
+[BepInExPack Valheim](https://thunderstore.io/c/valheim/p/denikson/BepInExPack_Valheim/).
 Install it with a mod manager, or put `DeathMessage.dll` in `BepInEx/plugins/` by hand. It goes
 in the game of each player who wants it, and in `BepInEx/plugins/` on the dedicated server. DiscordConnector is optional and only belongs on the server.
 
