@@ -21,6 +21,7 @@ namespace DeathMessage
 		Only the dying player's own game knows what hit them (damage to a character is worked out
 		by the client that owns it), which is why the server cannot do this alone.
 	*/
+	[BepInDependency("nwesterhausen.DiscordConnector", BepInDependency.DependencyFlags.SoftDependency)]
 	[BepInPlugin(Guid, Name, Version)]
 	public class DeathMessagePlugin : BaseUnityPlugin
 	{
